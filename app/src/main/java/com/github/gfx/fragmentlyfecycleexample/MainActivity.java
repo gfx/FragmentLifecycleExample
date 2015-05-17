@@ -2,9 +2,9 @@ package com.github.gfx.fragmentlyfecycleexample;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -16,6 +16,10 @@ import android.view.ViewGroup;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    static {
+        FragmentManager.enableDebugLogging(true);
+    }
 
     public static class MyFragment extends Fragment {
 
@@ -106,26 +110,18 @@ public class MainActivity extends AppCompatActivity {
         txn.detach(fragment);
         txn.commit();
 
-        new Handler().postDelayed(new Runnable() {
+        findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
+            public void onClick(View v) {
                 FragmentTransaction txn = getSupportFragmentManager().beginTransaction();
-                txn.attach(fragment);
+                if (fragment.isDetached()) {
+                    txn.attach(fragment);
+                } else {
+                    txn.detach(fragment);
+                }
                 txn.commit();
-
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        FragmentTransaction txn = getSupportFragmentManager()
-                                .beginTransaction();
-                        txn.detach(fragment);
-                        txn.commit();
-                    }
-                }, 2000);
-
             }
-        }, 2000);
-
+        });
         Log.d("MainActivity", "onCreate finished");
     }
 
